@@ -1,6 +1,6 @@
-"""
+
 ShopSmart E-Commerce Analytics — Python Analysis
-=================================================
+
 Requirements:
     pip install pandas sqlalchemy pymysql matplotlib seaborn
 
@@ -8,11 +8,11 @@ Usage:
     1. Update credentials in the CONFIG block below.
     2. Run: python analysis.py
     3. Plots are saved as PNG files in the same directory.
-"""
 
-# ─────────────────────────────────────────────
-# 0. IMPORTS & CONFIG
-# ─────────────────────────────────────────────
+
+
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -22,7 +22,7 @@ from datetime import date
 from urllib.parse import quote_plus
 
 
-# ── Edit these ──
+
 USER     = "****"
 PASSWORD = quote_plus("****")
 HOST     = "127.0.0.1"
@@ -44,9 +44,9 @@ sns.set_theme(style="whitegrid", palette="muted")
 plt.rcParams["figure.dpi"] = 130
 
 
-# ─────────────────────────────────────────────
+
 # C1-A. Pull Wide Fact Table
-# ─────────────────────────────────────────────
+
 print("\n📦 Loading fact table...")
 
 fact_sql = """
@@ -118,9 +118,7 @@ print("\n   Order status distribution:")
 print(df.drop_duplicates("order_id")["order_status"].value_counts().to_string())
 
 
-# ─────────────────────────────────────────────
 # C1-C. RFM Analysis
-# ─────────────────────────────────────────────
 print("\n📊 Computing RFM...")
 
 # Use only Delivered + Paid orders for RFM
@@ -159,9 +157,8 @@ rfm["recency"] = (ref_date - rfm["last_order"]).dt.days
 print(rfm[["recency", "frequency", "monetary"]].describe().round(2))
 
 
-# ─────────────────────────────────────────────
 # C1-D. RFM Scoring & Segmentation (4 buckets)
-# ─────────────────────────────────────────────
+
 # Score each metric 1-4 using quartiles
 rfm["R_score"] = pd.qcut(rfm["recency"],   q=4, labels=[4, 3, 2, 1]).astype(int)   # lower recency = better
 rfm["F_score"] = pd.qcut(rfm["frequency"].rank(method="first"), q=4, labels=[1, 2, 3, 4]).astype(int)
@@ -190,9 +187,8 @@ print("\n   RFM Segments:")
 print(seg_summary.to_string())
 
 
-# ─────────────────────────────────────────────
 # PLOT 1: Monthly Revenue Line Chart
-# ─────────────────────────────────────────────
+
 print("\n📈 Plot 1: Monthly Revenue...")
 
 monthly_rev = (
@@ -218,9 +214,8 @@ plt.close()
 print("   Saved → plot1_monthly_revenue.png")
 
 
-# ─────────────────────────────────────────────
 # PLOT 2: Top Categories — Revenue & Quantity
-# ─────────────────────────────────────────────
+
 print("\n📊 Plot 2: Top Categories...")
 
 cat_stats = (
@@ -252,9 +247,8 @@ plt.close()
 print("   Saved → plot2_top_categories.png")
 
 
-# ─────────────────────────────────────────────
 # PLOT 3: Return Rate by Carrier
-# ─────────────────────────────────────────────
+
 print("\n📦 Plot 3: Return Rate by Carrier...")
 
 carrier_df = (
@@ -284,9 +278,8 @@ plt.close()
 print("   Saved → plot3_return_rate_carrier.png")
 
 
-# ─────────────────────────────────────────────
 # PLOT 4: RFM Segment Distribution (Bonus)
-# ─────────────────────────────────────────────
+
 print("\n🏷️  Plot 4: RFM Segments...")
 
 seg_colors = {"Champions": "#16A34A", "Loyal": "#2563EB", "Potential": "#D97706", "At-Risk": "#DC2626"}
@@ -306,9 +299,9 @@ plt.close()
 print("   Saved → plot4_rfm_segments.png")
 
 
-# ─────────────────────────────────────────────
+
 # EXPORT RFM Table
-# ─────────────────────────────────────────────
+
 rfm.to_csv("rfm_output.csv", index=False)
 print("\n✅ RFM table saved → rfm_output.csv")
 
@@ -317,4 +310,5 @@ print("   plot1_monthly_revenue.png")
 print("   plot2_top_categories.png")
 print("   plot3_return_rate_carrier.png")
 print("   plot4_rfm_segments.png")
+
 print("   rfm_output.csv")
