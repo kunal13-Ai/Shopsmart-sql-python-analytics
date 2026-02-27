@@ -1,13 +1,10 @@
--- ========================================
+
 -- ShopSmart SQL Assignment - Answers
 -- Part B: SQL EDA Tasks (B1-B18)
--- ========================================
 
 USE shopsmart;
 
--- ========================================
 -- B1) BASIC SANITY CHECKS
--- ========================================
 
 -- B1.1) Are there duplicate customer emails?
 SELECT email, COUNT(*) AS count
@@ -47,9 +44,8 @@ ORDER BY order_count DESC;
 -- Helps understand order fulfillment success rate.
 
 
--- ========================================
 -- B2) REVENUE & GROWTH
--- ========================================
+
 
 -- B2.4) Total revenue (grand_total) for Delivered orders only
 SELECT 
@@ -60,7 +56,7 @@ WHERE o.order_status = 'Delivered'
   AND p.payment_status = 'Paid';
 
 -- Interpretation: This is the actual realized revenue (only paid + delivered).
--- Excludes cancelled/returned orders.
+-- Does not include cancelled/returned orders.
 
 
 -- B2.5) Monthly revenue trend (YYYY-MM)
@@ -96,9 +92,7 @@ ORDER BY month, revenue DESC;
 -- Helps allocate marketing budget.
 
 
--- ========================================
 -- B3) CUSTOMER ANALYTICS
--- ========================================
 
 -- B3.7) Top 10 customers by lifetime revenue
 SELECT 
@@ -128,8 +122,7 @@ WITH customer_orders AS (
         COUNT(DISTINCT order_id) AS order_count
     FROM orders
     WHERE order_status = 'Delivered'
-    GROUP BY customer_id
-)
+    GROUP BY customer_id )
 SELECT 
     SUM(CASE WHEN order_count >= 2 THEN 1 ELSE 0 END) AS repeat_customers,
     COUNT(*) AS total_customers,
@@ -144,9 +137,9 @@ FROM customer_orders;
 WITH customer_cohorts AS (
     SELECT 
         customer_id,
-        DATE_FORMAT(signup_date, '%Y-%m') AS cohort_month
-    FROM customers
-),
+        DATE_FORMAT(signup_date, '%Y-%m') AS cohort_month ),
+    FROM customers 
+
 customer_activity AS (
     SELECT 
         o.customer_id,
@@ -158,8 +151,8 @@ customer_activity AS (
         ) AS months_since_signup
     FROM orders o
     JOIN customer_cohorts cc ON cc.customer_id = o.customer_id
-    WHERE o.order_status = 'Delivered'
-)
+    WHERE o.order_status = 'Delivered' )
+
 SELECT 
     cohort_month,
     months_since_signup,
@@ -172,9 +165,7 @@ ORDER BY cohort_month, months_since_signup;
 -- Month 0 = orders in signup month, Month 1 = next month, etc.
 
 
--- ========================================
 -- B4) PRODUCT & CATEGORY ANALYTICS
--- ========================================
 
 -- B4.10) Top categories by revenue and by quantity
 -- By Revenue
@@ -246,9 +237,7 @@ LIMIT 10;
 -- Consider promoting them more or increasing inventory.
 
 
--- ========================================
 -- B5) OPERATIONS & DELIVERY
--- ========================================
 
 -- B5.13) Avg delivery days by carrier
 SELECT 
@@ -309,9 +298,7 @@ ORDER BY cancellation_rate_pct DESC;
 -- Prepaid (UPI/Wallet/Card) has lower cancellation.
 
 
--- ========================================
 -- B6) ADVANCED SQL (WINDOW FUNCTIONS)
--- ========================================
 
 -- B6.16) Rank categories by revenue per month
 WITH monthly_category_revenue AS (
@@ -323,8 +310,8 @@ WITH monthly_category_revenue AS (
     JOIN order_items oi ON oi.order_id = o.order_id
     JOIN products p ON p.product_id = oi.product_id
     WHERE o.order_status = 'Delivered'
-    GROUP BY DATE_FORMAT(o.order_date, '%Y-%m'), p.category
-)
+    GROUP BY DATE_FORMAT(o.order_date, '%Y-%m'), p.category )
+
 SELECT 
     month,
     category,
@@ -355,8 +342,8 @@ WITH customer_order_history AS (
     JOIN orders o ON o.customer_id = c.customer_id
     JOIN payments p ON p.order_id = o.order_id
     WHERE o.order_status = 'Delivered'
-      AND p.payment_status = 'Paid'
-)
+      AND p.payment_status = 'Paid' )
+
 SELECT 
     customer_id,
     full_name,
@@ -407,6 +394,3 @@ LIMIT 20;
 -- Use for cross-sell recommendations (e.g., "Customers who bought Electronics also bought Beauty").
 
 
--- ========================================
--- END OF ANSWERS.SQL
--- ========================================
